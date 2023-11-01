@@ -9,10 +9,10 @@ char mqttPort[6] = "1883"; // Default MQTT port
 char mqttUser[40] = ""; // Default MQTT user (can be an empty string)
 char mqttPassword[40] = ""; // Default MQTT password (can be an empty string)
 
-const char* apName = "ESP8266-MQTT";
-const char* clientID = "ESP8266-LED";
-const char* ledTopic = "led";
-const int ledPin = LED_BUILTIN;
+const char* apName = "ESP8266 Relay";
+const char* clientID = "esp8266-relay";
+const char* topic = "relay";
+const int pin = 0;
 
 WiFiClient wlan;
 PubSubClient mqtt(wlan);
@@ -31,7 +31,7 @@ void reconnect() {
     Serial.println("Attempting to connect to the MQTT server...");
     if (mqtt.connect(clientID, mqttUser, mqttPassword)) {
       Serial.println("MQTT reconnected");
-      mqtt.subscribe(ledTopic);
+      mqtt.subscribe(topic);
     } else {
       Serial.print("MQTT connect failed, retrying...");
       delay(2000);
@@ -42,7 +42,7 @@ void reconnect() {
 void onMessage(char* topic, byte* payload, unsigned int length) {
   // Handle received messages
   String payloadStr = "";
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     payloadStr += (char)payload[i];
   }
 
@@ -51,19 +51,18 @@ void onMessage(char* topic, byte* payload, unsigned int length) {
   Serial.print("] ");
   Serial.println(payloadStr);
 
-  if (strcmp(topic, ledTopic) == 0) {
+  if (strcmp(topic, topic) == 0) {
     // If an LED control message is received, perform the corresponding action
     if (payloadStr == "on") {
-      digitalWrite(ledPin, HIGH);
+      digitalWrite(pin, LOW);
     } else if (payloadStr == "off") {
-      digitalWrite(ledPin, LOW);
+      digitalWrite(pin, HIGH);
     }
   }
 }
 
-
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(pin, OUTPUT);
 
   WiFiManager wifiManager;
   // Add custom parameters for configuring MQTT server information
