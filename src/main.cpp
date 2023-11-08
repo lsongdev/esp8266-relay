@@ -11,8 +11,10 @@ char mqttPassword[40] = ""; // Default MQTT password (can be an empty string)
 
 const char* apName = "ESP8266 Relay";
 const char* clientID = "esp8266-relay";
-const char* topic = "relay";
-const int pin = 0;
+const char* topic = "relay"; // Topic to control the relay
+
+const int RY1 = 0;
+const int LED = BUILTIN_LED;
 
 WiFiClient wlan;
 PubSubClient mqtt(wlan);
@@ -31,7 +33,7 @@ void reconnect() {
     Serial.println("Attempting to connect to the MQTT server...");
     if (mqtt.connect(clientID, mqttUser, mqttPassword)) {
       Serial.println("MQTT reconnected");
-      mqtt.subscribe(topic);
+      mqtt.subscribe(topic); // Subscribe to the control topic
     } else {
       Serial.print("MQTT connect failed, retrying...");
       delay(2000);
@@ -51,18 +53,22 @@ void onMessage(char* topic, byte* payload, unsigned int length) {
   Serial.print("] ");
   Serial.println(payloadStr);
 
-  if (strcmp(topic, topic) == 0) {
-    // If an LED control message is received, perform the corresponding action
-    if (payloadStr == "on") {
-      digitalWrite(pin, LOW);
-    } else if (payloadStr == "off") {
-      digitalWrite(pin, HIGH);
+  if (strcmp(topic, topic) == 0) { // Compare with the control topic
+    if (payloadStr == "relay1on") {
+      digitalWrite(RY1, HIGH); // Open the first relay
+    } else if (payloadStr == "relay1off") {
+      digitalWrite(RY1, LOW); // Close the first relay
+    } else if (payloadStr == "led1on") {
+      digitalWrite(LED, LOW); // Turn on the LED
+    } else if (payloadStr == "led1off") {
+      digitalWrite(LED, HIGH); // Turn off the LED
     }
   }
 }
 
 void setup() {
-  pinMode(pin, OUTPUT);
+  pinMode(RY1, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   WiFiManager wifiManager;
   // Add custom parameters for configuring MQTT server information
