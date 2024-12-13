@@ -68,7 +68,6 @@ void onMessage(char *topic, byte *payload, unsigned int length)
 
 void setup()
 {
-
   Serial.begin(115200);
   pinMode(RY1, OUTPUT);
   pinMode(LED1, OUTPUT);
