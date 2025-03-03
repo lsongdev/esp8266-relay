@@ -2,7 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-const char *ssid = "wifi@lsong.one";
+const char *ssid = "wifi@lsong.org";
 const char *password = "song940@163.com";
 const char *mqttServer = "broker.emqx.io";
 const char *clientID = "esp8266-relay";
@@ -44,23 +44,25 @@ void onMessage(char *topic, byte *payload, unsigned int length)
   Serial.println("Received message: [" + String(topic) + "] " + payloadStr);
 
   if (strcmp(topic, relayTopic) == 0)
-  { // Compare with the control topic
+  {
     if (payloadStr == "relay1on")
     {
-      digitalWrite(RY1, HIGH); // Open the first relay
+      digitalWrite(RY1, LOW);
     }
     else if (payloadStr == "relay1off")
     {
-      digitalWrite(RY1, LOW); // Close the first relay
+      digitalWrite(RY1, HIGH);
     }
     else if (payloadStr == "led1on")
     {
-      digitalWrite(LED1, LOW); // Turn on the LED
+      digitalWrite(LED1, LOW);
     }
     else if (payloadStr == "led1off")
     {
-      digitalWrite(LED1, HIGH); // Turn off the LED
-    } else if (payloadStr == "ping") {
+      digitalWrite(LED1, HIGH);
+    }
+    else if (payloadStr == "ping")
+    {
       mqtt.publish(relayTopic, "pong");
     }
   }
@@ -71,6 +73,8 @@ void setup()
   Serial.begin(115200);
   pinMode(RY1, OUTPUT);
   pinMode(LED1, OUTPUT);
+  digitalWrite(RY1, HIGH);
+  digitalWrite(LED1, HIGH);
 
   // Connect to WiFi
   WiFi.mode(WIFI_STA);
